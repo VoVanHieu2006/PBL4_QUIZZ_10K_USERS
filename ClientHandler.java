@@ -9,15 +9,19 @@ import java.nio.charset.StandardCharsets;
 public class ClientHandler
         extends ChannelInboundHandlerAdapter {
 
-        @Override
-        public void exceptionCaught(
-                        ChannelHandlerContext ctx,
-                        Throwable cause
-        ) {
+    @Override
+    public void channelActive(
+            ChannelHandlerContext ctx
+    ) {
 
-                cause.printStackTrace();
-                ctx.close();
-        }
+        System.out.println(
+                "Connected!"
+                        + "\nChannel: "
+                        + ctx.channel().id().asShortText()
+                        + "\nEventLoop: "
+                        + Thread.currentThread().getName()
+        );
+    }
 
     @Override
     public void channelRead(
@@ -35,15 +39,24 @@ public class ClientHandler
                     );
 
             System.out.println(
-                    "Client received: "
+                    "Server response: "
                             + response
             );
 
         } finally {
 
             buffer.release();
-
-            ctx.close();
         }
+    }
+
+    @Override
+    public void exceptionCaught(
+            ChannelHandlerContext ctx,
+            Throwable cause
+    ) {
+
+        cause.printStackTrace();
+
+        ctx.close();
     }
 }

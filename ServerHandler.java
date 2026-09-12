@@ -15,22 +15,12 @@ public class ServerHandler
     ) {
 
         System.out.println(
-                "Client connected: "
+                "CLIENT CONNECTED"
+                        + "\n  Channel ID: "
+                        + ctx.channel().id().asShortText()
+                        + "\n  Remote: "
                         + ctx.channel().remoteAddress()
-        );
-
-        System.out.println(
-                "Channel ID: "
-                        + ctx.channel().id()
-        );
-
-        System.out.println(
-                "EventLoop: "
-                        + ctx.channel().eventLoop()
-        );
-
-        System.out.println(
-                "Thread: "
+                        + "\n  EventLoop: "
                         + Thread.currentThread().getName()
         );
     }
@@ -51,12 +41,19 @@ public class ServerHandler
                     );
 
             System.out.println(
-                    "Server received: "
+                    "\nMESSAGE RECEIVED"
+                            + "\n  Channel ID: "
+                            + ctx.channel().id().asShortText()
+                            + "\n  Message: "
                             + message
+                            + "\n  EventLoop: "
+                            + Thread.currentThread().getName()
             );
 
             String response =
-                    "Hello Client, I received: "
+                    "Server received from "
+                            + ctx.channel().id().asShortText()
+                            + ": "
                             + message;
 
             ByteBuf responseBuffer =
@@ -81,7 +78,9 @@ public class ServerHandler
     ) {
 
         System.out.println(
-                "Client disconnected"
+                "CLIENT DISCONNECTED"
+                        + "\n  Channel ID: "
+                        + ctx.channel().id().asShortText()
         );
     }
 
