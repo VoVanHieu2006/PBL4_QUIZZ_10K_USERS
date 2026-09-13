@@ -2,18 +2,19 @@ package com.quiz.lab;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.MultiThreadIoEventLoopGroup;
-import io.netty.channel.nio.NioIoHandler;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.nio.NioIoHandler;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 
-public class Server {
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
+
+public class WebSocketServer {
 
     private static final int PORT = 8080;
 
@@ -27,16 +28,18 @@ public class Server {
 
         EventLoopGroup workerGroup =
                 new MultiThreadIoEventLoopGroup(
-                        1,
+                        2,
                         NioIoHandler.newFactory()
                 );
 
         try {
 
-            ServerBootstrap bootstrap = new ServerBootstrap();
+            ServerBootstrap bootstrap =
+                    new ServerBootstrap();
 
             bootstrap
                     .group(bossGroup, workerGroup)
+
                     .channel(NioServerSocketChannel.class)
 
                     .childOption(
@@ -47,30 +50,51 @@ public class Server {
                     .childHandler(
                             new ChannelInitializer<SocketChannel>() {
 
-
                                 @Override
                                 protected void initChannel(
                                         SocketChannel channel
                                 ) {
 
                                     channel.pipeline().addLast(
-                                            new ServerHandler()
+                                            new HttpServerCodec()
+                                    );
+
+                                    channel.pipeline().addLast(
+                                            new HttpObjectAggregator(
+                                                    64 * 1024
+                                            )
+                                    );
+
+                                    channel.pipeline().addLast(
+                                            new WebSocketServerProtocolHandler( // biến kết nối từ HTTP => WebSocket
+                                                    "/ws"
+                                            )
+                                    );
+
+                                    channel.pipeline().addLast(
+                                            new WebSocketFrameHandler()
                                     );
                                 }
                             }
                     );
 
             Channel channel =
-                    bootstrap.bind(PORT)
-                             .sync()
-                             .channel();
+                    bootstrap
+                            .bind(PORT)
+                            .sync()
+                            .channel();
 
             System.out.println(
-                    "Server started on port " + PORT
+                    "WebSocket server started at:"
             );
 
-            channel.closeFuture()
-                   .sync();
+            System.out.println(
+                    "ws://localhost:" + PORT + "/ws"
+            );
+
+            channel
+                    .closeFuture()
+                    .sync();
 
         } finally {
 
