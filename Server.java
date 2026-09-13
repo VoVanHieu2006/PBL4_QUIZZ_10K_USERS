@@ -27,7 +27,7 @@ public class Server {
 
         EventLoopGroup workerGroup =
                 new MultiThreadIoEventLoopGroup(
-                        2,
+                        1,
                         NioIoHandler.newFactory()
                 );
 

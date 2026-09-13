@@ -1,10 +1,13 @@
 package com.quiz.lab;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
+
 
 public class ServerHandler
         extends ChannelInboundHandlerAdapter {
@@ -34,7 +37,6 @@ public class ServerHandler
         ByteBuf buffer = (ByteBuf) msg;
 
         try {
-
             String message =
                     buffer.toString(
                             StandardCharsets.UTF_8
@@ -49,6 +51,23 @@ public class ServerHandler
                             + "\n  EventLoop: "
                             + Thread.currentThread().getName()
             );
+
+        //     String response =
+        //             "Server received from "
+        //                     + ctx.channel().id().asShortText()
+        //                     + ": "
+        //                     + message;
+
+        //     ctx.executor().schedule(() -> {
+        //     if (ctx.channel().isActive()) {
+        //             ctx.writeAndFlush(
+        //                     Unpooled.copiedBuffer(
+        //                             response,
+        //                             StandardCharsets.UTF_8
+        //                     )
+        //             );
+        //     }
+        //     }, 5, TimeUnit.SECONDS);
 
             String response =
                     "Server received from "
